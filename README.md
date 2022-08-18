@@ -1,6 +1,8 @@
 # RENCI-Demo
 This is the assessment written with gRPC, Bazel, and Protocol Buffers since the provided assessment did not compile. The executables for the chat room and client have been included in the repository. If you wish to build the code yourself, the following command will do the trick: `./bazelisk-linux-amd64 build //...`. To run, use the following `./bazelisk-linux-amd64 run //chat_room` followed by `./bazelisk-linux-amd64 run //client`.
 
+In general, I think you will find the source code in this repository much easier to follow than the original source code due to the simplicty provided by Protocol Buffers and gRPC being used.
+
 The following should be noted about this repository.
 * First and foremost this is a public repository. This allows easy access by all parties.
 * All dependencies are included within the build process itself. There is no need to ensure cmake/make, gRPC, Protocol Buffers, or Bazel are included.

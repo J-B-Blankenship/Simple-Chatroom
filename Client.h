@@ -28,14 +28,13 @@ namespace Renci
 
             grpc::ClientContext context;
             grpc::Status status = m_stub->sendMessage(&context, message, &response);
-
             if(status.ok())
             {
                 for(const auto& message : response.messages())
                 {
                     std::cout << message << std::endl;
                 }
-                m_lastMessageId += response.messages_size();
+                m_lastMessageId += response.messages_size() + 1; //Include the message sent
             }
             else
             {
@@ -51,10 +50,14 @@ namespace Renci
             Renci::Response response;
 
             grpc::ClientContext context;
-            grpc::Status status = m_stub->sendMessage(&context, message, &response);
-
+            grpc::Status status = m_stub->checkForMessages(&context, message, &response);
             if(status.ok())
             {
+                if(response.messages_size() == 0)
+                {
+                    return;
+                }
+
                 for(const auto& message : response.messages())
                 {
                     std::cout << message << std::endl;
