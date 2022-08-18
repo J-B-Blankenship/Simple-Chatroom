@@ -32,3 +32,6 @@
 
 # Visual Studio
 .vscode
+
+# Bazel
+bazel-*
