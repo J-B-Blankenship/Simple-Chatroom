@@ -1,0 +1,77 @@
+Your task is to design a chatbot that can connect to the chatroom as a client and respond to commands
+from other clients.
+
+ARCHITECTURE
+
+   client(s)      chatroom         chatbot
+  +--------+     +---------+      + - - - +
+  |  (n)   |-----|         |- - - -       -
+  +--------+     +---------+      + - - - +
+
+Clients send messages to the chatroom.  Some of those messages should be interpreted as commands
+by the chatbot, which will respond to the chatroom with an answer (a new message).  The response
+will be relayed to all n clients.
+
+COMMANDS
+
+The two commands you need to implement are:
+
+!echo - should return to the chatroom a user's message
+  Example:
+    user sends: "!echo jiminy cricket"
+    bot responds: "jiminy cricket"
+
+  Example:
+    user sends: "!echo !echo"
+    bot responds: "!echo"
+
+!eval - should return to the chatroom the result of one four-function (+,-,*,/) whitespace-separated calculation on two integers
+  Example:
+    user sends: "!eval 4 * 8"
+    bot responds: "32"
+
+  Example:
+    user sends: "!eval 4 * 8 * h"
+    bot responds: "Invalid input to eval"
+
+  Example:
+    user sends: "!eval 84 / 2"
+    bot responds: "42"
+
+Design and implement a unit test for the eval function you write for the chatbot.
+
+We should be able to build your chatbot with 'make chatbot' and run it with './chatbot <hostname_or_ip> <portnum>'.
+We will use Ubuntu 20.04 with g++ and libboost-all-dev installed to build and test your code.
+
+Finally, there is a bug we have observed in the existing code when sending
+very long messages (around 300 characters or more). Please find it and fix it.
+
+
+ENVIRONMENT
+
+As a possible aid in getting a functional environment, we have included some docker commands.
+
+If run from within this repository, /host within the container will be mapped to the present working directory.
+
+To start an Ubuntu20 container:
+  docker run -dt --name chatapp -v `pwd`:/host ubuntu:20.04
+
+To connect to the running container:
+  docker exec -it chatapp /bin/bash
+
+
+To install g++ and boost inside the container (480MB):
+  apt-get update
+  apt-get install -y g++ libboost-all-dev make
+
+To build inside the container:
+  cd /host
+  make
+
+
+To stop a running container:
+  docker stop chatapp
+
+To remove a container:
+  docker rm chatapp
+
