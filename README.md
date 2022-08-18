@@ -5,7 +5,7 @@ The following should be noted about this repository.
 * First and foremost this is a public repository. This allows easy access by all parties.
 * All dependencies are included within the build process itself. There is no need to ensure cmake/make, gRPC, Protocol Buffers, or Bazel are included.
 * The usual permission controls are set in place to prevent anyone from committing to this repository.
-* Additional checks are in place to ensure no direct merging to master amongst other checks.
+* Additional checks not put in place to keep from merging directly with master for simplicity.
 * The source code can be built and run on both Windows and Linux
 
 Additional information you may find that tickles your fancy. The build system used (Bazel) allows for multiple languages to be built or packaged appropriately. This 
