@@ -1,8 +1,8 @@
 # RENCI-Demo
 This is the assessment written with gRPC, Bazel, and Protocol Buffers since the provided assessment did not compile, nor was I able to get Docker and make to work right off the bat. 
 The executables for the chat room and client have been included in the repository. If you wish to build the code yourself, the following command will do the trick: `./bazelisk-linux-amd64 build //...`. To run, 
-use the following `./bazelisk-linux-amd64 run //chat_room` followed by `./bazelisk-linux-amd64 run //client`. I have taken the additional precautions to ensure this is compatabile with your
-compiler version (ie. language feature support) and OS. I have used these libraries and tools with a previous employer in a similar situation of antiquated OS and gcc/g++ version to replace
+use the following `./bazelisk-linux-amd64 run //chat_room` followed by `./bazelisk-linux-amd64 run //client`.  To run the tests, the following command will do the trick: `./bazelisk-linux-amd64 test :test_chat_room`. I have taken the additional precautions to ensure this is compatabile with your
+language standard of C++14. I have used these libraries and tools with a previous employer in a similar situation of antiquated OS and gcc/g++ version to replace
 their entire communication layer to enforce type checking and standardization, remove ad-hoc reinvention of network communication protocols, and introduce scalability and usability internally.
 
 In general, I think you will find the source code in this repository much easier to follow than the original source code due to the simplicty provided by Protocol Buffers and gRPC being used.
