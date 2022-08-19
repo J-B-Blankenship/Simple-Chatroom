@@ -48,6 +48,15 @@ namespace Renci
                     }
                     else if(message[i] == ' ')
                     {
+                        //A clever solution from a colleague with a past employer and project I worked.
+                        //We could not find any flaws with it at the time for super long inputs or inputs
+                        //beyond the max value.
+                        if(message.substr(0, i) > "18446744073709551615"
+                            || message.substr(0,i).size() > 20)
+                        {
+                            history.push_back("First number exceeds max value of an unsigned 64 bit integer.");
+                            return;
+                        }
                         firstNumber = stoull(message.substr(0, i));
                         parsingFirstNumber = false;
                     }
@@ -90,11 +99,19 @@ namespace Renci
                 //Repeat of the first
                 else if(parsingSecondNumber)
                 {
-                    std::cout << "Parsing second number" << std::endl;
                     //Terminate at the end of message and instantiate secondNumber
                     if(message[i] >= '0' && message[i] <= '9'
                         && i == message.size() - 1)
                     {
+                        //A clever solution from a colleague with a past employer and project I worked.
+                        //We could not find any flaws with it at the time for super long inputs or inputs
+                        //beyond the max value.
+                        if(message.substr(startOfSecondNumber) > "18446744073709551615"
+                            || message.substr(0,i).size() > 20)
+                        {
+                            history.push_back("Second number exceeds max value of an unsigned 64 bit integer.");
+                            return;
+                        }
                         secondNumber = stoull(message.substr(startOfSecondNumber));
                         parsingSecondNumber = false;
                     }
@@ -114,7 +131,6 @@ namespace Renci
             //Now to do the operation specified
             if(message.find('+') != std::string::npos)
             {
-                std::cout << "+ operator" << std::endl;
                 //Checking for overflow.
                 if(std::numeric_limits<uint64_t>::max() - firstNumber < secondNumber)
                 {
@@ -125,7 +141,6 @@ namespace Renci
             }
             else if(message.find('-') != std::string::npos)
             {
-                std::cout << "- operator" << std::endl;
                 if(firstNumber < secondNumber)
                 {
                     history.emplace_back("Second number is larger than the first.");
@@ -135,7 +150,6 @@ namespace Renci
             }
             else if(message.find('*') != std::string::npos)
             {
-                std::cout << "* operator" << std::endl;
                 //Too lazy to bother checking second if-statement with the interaction of a 0. Just return 0 here.
                 if(firstNumber == 0 || secondNumber == 0)
                 {
@@ -144,7 +158,9 @@ namespace Renci
                 //This should catch overflow in every case where the result is at least 1 more than second number.
                 //However, it will not catch the cases for less than 1 and greater than 0.
                 //I am not entirely sure how one would check this with the resulting truncation if swapped to a 
-                //signed integer.
+                //signed integer. Using the % mod operator may work. If a remainder and first < second,
+                //then that should result in exceeding the max unsigned int. I will do this and test it
+                //if I think about it near the end.
                 if(std::numeric_limits<uint64_t>::max() / firstNumber < secondNumber)
                 {
                     history.emplace_back("Multiplication of provided integers exceeds max supported number.");
@@ -154,7 +170,6 @@ namespace Renci
             }
             else if(message.find('/') != std::string::npos)
             {
-                std::cout << "/ operator" << std::endl;
                 if(secondNumber == 0)
                 {
                     history.emplace_back("Division by zero is not allowed.");

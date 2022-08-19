@@ -17,3 +17,10 @@ cc_binary(
     srcs = ["ChatRoom.h", "ChatRoomMain.cpp"],
     deps = [":message_framework"],
 )
+
+cc_test(
+    name = "test_chat_room",
+    srcs = glob(["Unit_Tests/*.cpp"]),
+    deps = ["@com_google_googletest//:gtest_main",
+            ":chat_room"]
+)
