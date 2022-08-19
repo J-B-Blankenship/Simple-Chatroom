@@ -11,20 +11,19 @@ namespace Renci
     class ChatRoomService final : public Renci::ChatRoom::Service
     {
     private:
-        std::vector<std::string> history{};
+        std::vector<std::string> m_history{};
         std::mutex m_mutex{};
 
         //Positive or negative numbers was not specified. Assumption of only positive numbers (ie. unsigned integers).
         //Minor modifications necessary to allow for negative numbers.
 
-        //TODO: Need additional checks for numbers that exceed max values
+        //Additional Features: support negative numbers, strip leading zeros from input
         void parseEvaluationCommand(const std::string& message)
         {
             //Nothing provided or minimum amount of characters for a valid expression not met
-            std::cout << "Parsing the following input for evaluation: " << message << std::endl;
             if(message.size() == 0 || message.size() < 5)
             {
-                history.push_back("Invalid input to eval");
+                m_history.push_back("Invalid input to eval");
                 return;
             }
 
@@ -51,10 +50,11 @@ namespace Renci
                         //A clever solution from a colleague with a past employer and project I worked.
                         //We could not find any flaws with it at the time for super long inputs or inputs
                         //beyond the max value.
-                        if(message.substr(0, i) > "18446744073709551615"
-                            || message.substr(0,i).size() > 20)
+                        if((message.substr(0, i) > "18446744073709551615"
+                            && message.substr(0,i).size() == 20)
+                            || message.substr(0, i).size() > 20)
                         {
-                            history.push_back("First number exceeds max value of an unsigned 64 bit integer.");
+                            m_history.push_back("First number exceeds max value of an unsigned 64 bit integer.");
                             return;
                         }
                         firstNumber = stoull(message.substr(0, i));
@@ -63,7 +63,7 @@ namespace Renci
                     //Invalid character. Only numbers or a single space allowed
                     else
                     {
-                        history.push_back("Invalid input to eval");
+                        m_history.push_back("Invalid input to eval");
                         return;
                     }
                 }
@@ -73,26 +73,24 @@ namespace Renci
                     if(message[i] == '*' || message[i] == '/'
                         || message[i] == '-' || message[i] == '+')
                     {
-                        std::cout << "Operator found." << std::endl;
                         //Check for the space following immediately after.
                         i++;
                         if(message[i] == ' ')
                         {
-                            std::cout << "Space found." << std::endl;
                             parsingSecondNumber = true;
                             startOfSecondNumber = i + 1;
                             continue;
                         }
                         else
                         {
-                            history.push_back("Invalid input to eval");
+                            m_history.push_back("Invalid input to eval");
                             return;
                         }
                     }
                     //A valid operator was not provided
                     else
                     {
-                        history.push_back("Invalid input to eval");
+                        m_history.push_back("Invalid input to eval");
                         return;
                     }
                 }
@@ -106,10 +104,11 @@ namespace Renci
                         //A clever solution from a colleague with a past employer and project I worked.
                         //We could not find any flaws with it at the time for super long inputs or inputs
                         //beyond the max value.
-                        if(message.substr(startOfSecondNumber) > "18446744073709551615"
-                            || message.substr(0,i).size() > 20)
+                        if((message.substr(startOfSecondNumber) > "18446744073709551615"
+                            && message.substr(startOfSecondNumber).size() == 20)
+                            || message.substr(startOfSecondNumber).size() > 20)
                         {
-                            history.push_back("Second number exceeds max value of an unsigned 64 bit integer.");
+                            m_history.push_back("Second number exceeds max value of an unsigned 64 bit integer.");
                             return;
                         }
                         secondNumber = stoull(message.substr(startOfSecondNumber));
@@ -122,7 +121,7 @@ namespace Renci
                     //Any character not a digit is invalid.
                     else
                     {
-                        history.push_back(std::string{"Invalid input to eval"});
+                        m_history.push_back(std::string{"Invalid input to eval"});
                         return;
                     }
                 }
@@ -134,26 +133,27 @@ namespace Renci
                 //Checking for overflow.
                 if(std::numeric_limits<uint64_t>::max() - firstNumber < secondNumber)
                 {
-                    history.emplace_back("Addition of provided integers exceeds max supported number.");
+                    m_history.emplace_back("Addition of provided integers exceeds max supported number.");
                     return;
                 }
-                history.push_back(std::to_string(firstNumber + secondNumber));
+                m_history.push_back(std::to_string(firstNumber + secondNumber));
             }
             else if(message.find('-') != std::string::npos)
             {
                 if(firstNumber < secondNumber)
                 {
-                    history.emplace_back("Second number is larger than the first.");
+                    m_history.emplace_back("Second number is larger than the first.");
                     return;
                 }
-                history.push_back(std::to_string(firstNumber - secondNumber));
+                m_history.push_back(std::to_string(firstNumber - secondNumber));
             }
             else if(message.find('*') != std::string::npos)
             {
                 //Too lazy to bother checking second if-statement with the interaction of a 0. Just return 0 here.
                 if(firstNumber == 0 || secondNumber == 0)
                 {
-                    history.push_back("0");
+                    m_history.push_back("0");
+                    return;
                 }
                 //This should catch overflow in every case where the result is at least 1 more than second number.
                 //However, it will not catch the cases for less than 1 and greater than 0.
@@ -163,25 +163,25 @@ namespace Renci
                 //if I think about it near the end.
                 if(std::numeric_limits<uint64_t>::max() / firstNumber < secondNumber)
                 {
-                    history.emplace_back("Multiplication of provided integers exceeds max supported number.");
+                    m_history.emplace_back("Multiplication of provided integers exceeds max supported number.");
                     return;
                 }
-                history.push_back(std::to_string(firstNumber * secondNumber));
+                m_history.push_back(std::to_string(firstNumber * secondNumber));
             }
             else if(message.find('/') != std::string::npos)
             {
                 if(secondNumber == 0)
                 {
-                    history.emplace_back("Division by zero is not allowed.");
+                    m_history.emplace_back("Division by zero is not allowed.");
                     return;
                 }
-                history.push_back(std::to_string(firstNumber / secondNumber));
+                m_history.push_back(std::to_string(firstNumber / secondNumber));
             }
             else
             {
                 //gRPC does not exit with a std::runtime_error if I recall correctly. It may though.
                 throw std::runtime_error{"parseEvaluationCommand has reached a section that should be unreachable."};
-                history.emplace_back("A critical error has occurred at runtime. This should be unreachable.");
+                m_history.emplace_back("A critical error has occurred at runtime. This should be unreachable.");
             }
         }
 
@@ -203,7 +203,7 @@ namespace Renci
                 {
                     if(message.find("echo ", i) != std::string::npos)
                     {
-                        history.push_back(message.substr(i + 6)); //6 comes from ! plus 'echo' plus the space
+                        m_history.push_back(message.substr(i + 6)); //6 comes from ! plus 'echo' plus the space
                         return; //Prevent further checking of commands
                     }
                     else if(message.find("eval ", i) != std::string::npos)
@@ -216,21 +216,23 @@ namespace Renci
         }
 
     public:
-        grpc::Status sendMessage(grpc::ServerContext* contex,
+        const std::vector<std::string>& getHistory() const { return m_history; }
+
+        grpc::Status sendMessage(grpc::ServerContext* context,
             const Post* post,
             Response* response) override
         {
             //Add some thread safety
             const std::lock_guard<std::mutex> lock{ m_mutex };
 
-            for(uint64_t i = post->identification(); i < history.size(); i++)
+            for(uint64_t i = post->identification(); i < m_history.size(); i++)
             {
                 std::string* temp = response->add_messages();
-                *temp = history[i];
+                *temp = m_history[i];
             }
 
             //Add the new message
-            history.push_back(post->message());
+            m_history.push_back(post->message());
             checkForCommands(post->message());
             return grpc::Status::OK;
         }
@@ -242,10 +244,10 @@ namespace Renci
             //Add some thread safety
             const std::lock_guard<std::mutex> lock{ m_mutex };
             
-            for(uint64_t i = post->identification(); i < history.size(); i++)
+            for(uint64_t i = post->identification(); i < m_history.size(); i++)
             {
                 std::string* temp = response->add_messages();
-                *temp = history[i];
+                *temp = m_history[i];
             }
             return grpc::Status::OK;
         }

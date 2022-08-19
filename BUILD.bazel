@@ -6,21 +6,27 @@ cc_library(
             "@com_github_grpc_grpc//:grpc++"],
 )
 
+cc_library(
+    name = "client_server",
+    hdrs = ["ChatRoom.h", "Client.h"],
+    deps = [":message_framework"]
+)
+
 cc_binary(
     name = "client",
     srcs = ["Client.h", "ClientMain.cpp"],
-    deps = [":message_framework"],
+    deps = [":client_server"],
 )
 
 cc_binary(
     name = "chat_room",
-    srcs = ["ChatRoom.h", "ChatRoomMain.cpp"],
-    deps = [":message_framework"],
+    srcs = ["ChatRoomMain.cpp"],
+    deps = [":client_server"],
 )
 
 cc_test(
     name = "test_chat_room",
     srcs = glob(["Unit_Tests/*.cpp"]),
     deps = ["@com_google_googletest//:gtest_main",
-            ":chat_room"]
+            ":client_server"]
 )
