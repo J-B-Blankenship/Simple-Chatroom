@@ -17,7 +17,8 @@ namespace Renci
         //Positive or negative numbers was not specified. Assumption of only positive numbers (ie. unsigned integers).
         //Minor modifications necessary to allow for negative numbers.
 
-        //Additional Features: support negative numbers, strip leading zeros from input
+        //Additional Features: support negative numbers, strip leading zeros from input,
+        //better messages for supported behavior vs. unsupported behavior
         void parseEvaluationCommand(const std::string& message)
         {
             //Nothing provided or minimum amount of characters for a valid expression not met
