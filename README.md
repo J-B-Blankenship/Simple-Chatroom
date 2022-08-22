@@ -1,4 +1,4 @@
-# RENCI-Demo
+# Chat-Room-Demo
 This is the assessment written with gRPC, Bazel, and Protocol Buffers since the provided assessment did not compile, nor was I able to get Docker and make to work right off the bat. 
 The executables for the chat room and client have been included in the repository. If you wish to build the code yourself, the following command will do the trick: `./bazelisk-linux-amd64 build //...`. To run, 
 use the following `./bazelisk-linux-amd64 run //chat_room` followed by `./bazelisk-linux-amd64 run //client`.  To run the tests, the following command will do the trick: `./bazelisk-linux-amd64 test :test_chat_room`. I have taken the additional precautions to ensure this is compatabile with your
