@@ -20,6 +20,7 @@ The following repository embodies a simple chat room of N clients (chat particip
 ## Possible Alterations to Development Environment
 
 * Support GitHub actions to verify merge requests with the passing of all unit tests for Linux and Windows
+* Proper organization of the source code into a directory structure
 
 ## Open Issues
 
